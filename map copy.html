@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>公屋查詢大法</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      margin: 0;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px; /* Adjust max-width if you want a wider layout */
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Center-aligns child elements */
+      gap: 16px;
+    }
+
+    /* Title */
+    h1 {
+      text-align: center;
+      margin: 0 0 8px 0;
+    }
+
+    /* 2x2 Grid for mode switch */
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      align-items: start;
+      gap: 12px;
+      width: 100%;
+    }
+
+    /* Button base */
+    .mode-card {
+      background: #ffffff;
+      border: 1px solid #e9ecef;
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    /* Icon Container - Fixed 100vw issue */
+    .mode-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10%;
+      background: #241e62;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .mode-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /*Words on buttons*/
+    .mode-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #212529;
+    }
+
+    /* Active button */
+    .mode-card.active {
+      background: #c4e6f2;
+      border-color: #434545;
+      box-shadow: 0 6px 16px rgba(49, 157, 224, 0.3);
+    }
+
+    .mode-card.active .mode-title {
+      color: #000000;
+    }
+
+    /* Main Content Card Below */
+    .content-panel {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .panel-section {
+      display: none;
+    }
+
+    .panel-section.active {
+      display: block;
+    }
+
+    /* Map styling - Fixed 100vw issue */
+    #map {
+      height: 400px;
+      width: 100%;
+      margin: 10px;
+      border: 1px solid #e9ecef;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .search-btn {
+      padding: 8px 12px;
+      margin-top: 10px;
+      cursor: pointer;
+      width: 100%;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      background: #c5e9fa;
+      font-weight: 600;
+    }
+
+    .type-menu {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 8px;
+      align-items: start;
+    }
+    .type-gp {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      
+    }
+    .gp-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #1f2730;
+      border-bottom: 2px solid #0a0073;
+      margin-bottom: 2px;
+      padding-bottom: 2px;
+      white-space: nowrap;
+    }
+    .stacks {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+    }
+    .type-btn{
+      padding: 2px 12px;
+      margin-top: 1px;
+      cursor: pointer;
+      width: 100%;
+      background:#d4c4f2;
+      border-color: #353b10;
+    }
+    .type-btn.active{
+      background: #ffd034;
+      border-color: #f6ff00;
+      box-shadow: 0 4px 12px #f6ff00;
+      font-weight: 600;
+    }
+    .description{
+      background: #ffffff;
+      border: 1px solid #221f0f;
+      border-radius: 5px;
+      padding: 20px;
+      margin-top: 6px;
+      width: 100%;
+      box-sizing: border-box;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    }
+    .d-content {
+      color: #000000;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+
+  .a-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0; /* Remove gap between buttons */
+      width: 100%;
+  }
+  .a-click {
+    background: #f4e10e;
+    border: 1px solid #353b10;
+    padding: 10px 14px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #1a1a1a;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 0; 
+    margin-top: -1px; 
+    transition: all 0.2s ease;
+  }
+/* Rounded top & bottom corners on the first item */
+  .a-click:first-child {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    margin-top: 0;
+  }
+  .a-click:last-child {
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  .a-click:hover {
+    background: #ffe84a;
+    position: relative;
+    z-index: 1; /* Ensures hover outline stays on top */
+    transform: translateY(-2px);
+  }
+  .a-click:active {
+    background: #ff930e;
+    position: relative;
+    z-index: 1; /* Ensures hover outline stays on top */
+    transform: translateY(0px);
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background-color: #f8f9fa;
+    border: 1px solid #000000;
+    margin-top: 10px;
+  }
+  .table th{
+    font-size: 14px;
+    background-color: #9bd5ea;
+    border: 1px solid #000000;
+    padding: 5px 5px;
+    text-align: center;
+  }
+  .table td{
+    font-size: 14px;
+    background-color: #ffffff;
+    border: 1px solid #000000;
+    padding: 5px 5px;
+    text-align: center;
+  }
+  .table-title{
+    position: relative;
+    font-weight: bold;
+    font-size: 20px;
+  }
+  .toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-weight: normal;
+    font-size: 13px;
+    color: #ff5234;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .toggle-btn:hover {
+    text-decoration: underline;
+  }
+  .table-body.collapsed {
+    display: none;
+  }
+  .table tr.hs td {background-color: #ff8974 !important;}
+  .table td.hs {background-color: #ff8974 !important;}
+  .table tr.ot td {background-color: #b8c6bc !important;}
+  .table td.ot {background-color: #b8c6bc !important;}
+
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>公屋查詢大法</h1>
+
+  <!-- Top 2x2 Switch Grid -->
+  <div class="button-grid">
+    <div class="mode-card active" onclick="selectMode('name', this)">
+      <div class="mode-icon">🏠</div>
+      <div class="mode-text">
+        <span class="mode-title">樓宇名稱</span>
+      </div>
+    </div>
+
+    <div class="mode-card" onclick="selectMode('type', this)">
+      <div class="mode-icon">🏢</div>
+      <div class="mode-text">
+        <span class="mode-title">樓宇類型</span>
+      </div>
+    </div>
+
+    <div class="mode-card" onclick="selectMode('column', this)">
+      <div class="mode-icon">🖋️</div>
+      <div class="mode-text">
+        <span class="mode-title">攻略文章</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Panel -->
+  <div class="content-panel">
+    <div id="panel-name" class="panel-section active">
+      <h4 style="font-weight: bold; margin-bottom: 12px; margin-top: 0;">輸入樓宇名稱：</h4>
+      <input type="text" id="BuildingName" placeholder="樓宇名稱 (e.g. 宏暉樓)">
+      <button class="search-btn" onclick="findBuildings()">搜尋樓宇</button>
+      <h4 style="font-weight: bold; margin-bottom: 12px; margin-top: 0;">或輸入屋邨名稱：</h4>
+      <input type="text" id="EstateName" placeholder="屋邨名稱 (e.g. 橫頭磡邨)">
+      <button class="search-btn" onclick="findEstates()">搜尋樓宇屋邨</button>
+    </div>
+
+    <div id="panel-type" class="panel-section">
+      <p style="font-weight: bold; margin-bottom: 12px; margin-top: 0;">選擇樓宇類型：</p>
+
+      <div class="type-menu">
+
+        <div class="type-gp">
+          <div class="gp-title"> 各類長型 / Slabs</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('屋建會舊長型'), describe('屋建會舊長型',this)">屋建會舊長型</button>
+            <button class="type-btn" onclick="findTypes('第七型徙置大廈'), describe('第七型徙置大廈',this)">第七型徙置大廈</button>
+            <button class="type-btn" onclick="findTypes('房委會舊長型'), describe('房委會舊長型',this)">房委會舊長型</button>
+            <button class="type-btn" onclick="findTypes('新長型'), describe('新長型',this)">新長型</button>
+          </div>
+        </div>
+        <div class="type-gp">
+          <div class="gp-title"> 70-80年代(一) / 70s-80s (1)</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('雙塔式'), describe('雙塔式',this)">雙塔式</button>
+            <button class="type-btn" onclick="findTypes('單座工字型'), describe('工字型',this)">單座工字型</button>
+            <button class="type-btn" onclick="findTypes('雙工字型'), describe('工字型',this)">雙連座工字型</button>
+            <button class="type-btn" onclick="findTypes('三連座工字型'), describe('工字型',this)">三連座工字型</button>
+          </div>
+        </div>
+        <div class="type-gp">
+          <div class="gp-title"> 70-80年代(二) / 70s-80s (2)</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('大十字型'), describe('大十字型',this)">大十字型</button>
+            <button class="type-btn" onclick="findTypes('單座I型'), describe('I型',this)">單座I型</button>
+            <button class="type-btn" onclick="findTypes('雙連座I型'), describe('I型',this)">雙連座I型</button>
+            <button class="type-btn" onclick="findTypes('三連座I型'), describe('I型',this)">三連座I型</button>
+          </div>
+        </div>
+        <div class="type-gp">
+          <div class="gp-title"> Y型 / Trident</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('Y1型'), describe('Y1型',this)">Y1型</button>
+            <button class="type-btn" onclick="findTypes('Y2型'), describe('Y2型',this)">Y2型</button>
+            <button class="type-btn" onclick="findTypes('Y3型'), describe('Y3型',this)">Y3型</button>
+            <button class="type-btn" onclick="findTypes('Y4型'), describe('Y4型',this)">Y4型</button>
+          </div>
+        </div>
+        <div class="type-gp">
+          <div class="gp-title"> 相連長型 / Linear</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('相連長型第一款'), describe('相連長型第一/三款', this)">相連長型第一款</button>
+            <button class="type-btn" onclick="findTypes('相連長型第三款'), describe('相連長型第一/三款', this)">相連長型第三款</button>
+            <button class="type-btn" onclick="findTypes('相連長型L款'), describe('相連長型L款', this)">相連長型L款</button>
+          </div>   
+        </div>
+        <div class="type-gp">
+          <div class="gp-title"> 和諧式(一) / Harmony (1)</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('和諧一型'), describe('和諧一型', this)">和諧一型</button>
+            <button class="type-btn" onclick="findTypes('和諧一A型'), describe('和諧一A型', this)">和諧一A型</button>
+            <button class="type-btn" onclick="findTypes('和諧二型'), describe('和諧二型', this)">和諧二型</button>
+            <button class="type-btn" onclick="findTypes('新和諧一型'), describe('新和諧一型', this)">新和諧一型</button>
+          </div>
+        </div>
+
+        <div class="type-gp">
+          <div class="gp-title"> 和諧式(二) / Harmony (2)</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('和諧三型');findTypes('和諧三A型'), describe('和諧三型&三A型', this)">和諧三型&三A型</button>
+            <button class="type-btn" onclick="findTypes('和諧三B型');findTypes('和諧三C型'), describe('和諧三B型&三C型', this)">和諧三B型&和諧三C型</button>
+            <button class="type-btn" onclick="findTypes('鄉村和諧式'), describe('鄉村和諧式', this)">鄉村和諧式</button>
+            <button class="type-btn" onclick="findTypes('單方向設計大廈'), describe('單方向設計大廈', this)">單方向設計大廈</button>
+            <button class="type-btn" onclick="findTypes('小型單位大廈'), describe('小型單位大廈', this)">小型單位大廈</button>
+            <button class="type-btn" onclick="findTypes('特別設計和諧式'), describe('特別設計(新)和諧式', this)">特別設計(新)和諧式</button>
+            <button class="type-btn" onclick="findTypes('長者住屋'), describe('長者住屋', this)">長者住屋</button>
+            <button class="type-btn" onclick="findTypes('連附翼'), describe('連附翼', this)">連附翼</button>
+          </div>
+        </div>
+
+        <div class="type-gp">
+          <div class="gp-title"> 居屋/房協類 / HOC/HSs</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('舊十字型'), describe('舊十字型', this)">舊十字型</button>
+            <button class="type-btn" onclick="findTypes('新十字型'), describe('新十字型', this)">新十字型</button>
+            <button class="type-btn" onclick="findTypes('康和一型'), describe('康和一型', this)">康和一型</button>
+            <button class="type-btn" onclick="findTypes('私人參建居屋'), describe('私人參建居屋', this)">私人參建居屋</button>
+            <button class="type-btn" onclick="findTypes('房協住宅'), describe('房協住宅', this)">房協住宅</button>
+          </div>
+        </div>
+        
+        <div class="type-gp">
+          <div class="gp-title"> 其他 / Others</div>
+          <div class="stacks"> 
+            <button class="type-btn" onclick="findTypes('非標準設計大廈'), describe('非標準設計大廈', this)">非標準設計大廈</button>
+            <button class="type-btn" onclick="findTypes('其他協會興建長型'), describe('其他協會興建長型', this)">其他協會興建長型</button>
+            <button class="type-btn" onclick="findTypes('單塔式'), describe('單塔式', this)">單塔式</button>
+            <button class="type-btn" onclick="findTypes('錯層式十字型'), describe('錯層式十字型', this)">錯層式十字型</button>
+            <button class="type-btn" onclick="findTypes('鄉村型'), describe('鄉村型', this)">鄉村型</button>
+            <button class="type-btn" onclick="findTypes('梯級型'), describe('梯級型', this)">梯級型</button>
+            <button class="type-btn" onclick="findTypes('多層中轉房屋'), describe('多層中轉房屋', this)">多層中轉房屋</button>
+            <button class="type-btn" onclick="findTypes('靈活式大廈'), describe('靈活式大廈', this)">靈活式大廈</button>
+            
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="panel-column" class="panel-section">
+      <p style="font-weight: bold; margin-bottom: 12px; margin-top: 0;">文章列表：</p>
+      <div class="a-list">
+        <div class="a-click" onclick="articles('屋邨名稱 (上)', this)"> 屋邨名稱 (上)</div>
+        <div class="a-click" onclick="articles('屋邨名稱 (下)', this)"> 屋邨名稱 (下)</div>
+        <div class="a-click" onclick="articles('重建區', this)"> 重建區</div>
+    </div>
+  </div>
+  <div id="map"></div>
+  <div id="des" class="description">
+    <h1 id="d-title"></h1>
+    <p id="d-content"></p>
+  </div>
+</div>
+
+<script>
+  function selectMode(modeId, cardElement) {
+    const cards = document.querySelectorAll('.mode-card');
+    cards.forEach(card => card.classList.remove('active'));
+    cardElement.classList.add('active');
+
+    const panels = document.querySelectorAll('.panel-section');
+    panels.forEach(panel => panel.classList.remove('active'));
+
+    const activePanel = document.getElementById(`panel-${modeId}`);
+    if (activePanel) {
+      activePanel.classList.add('active');
+    }
+
+    setTimeout(()=>{map.invalidateSize();}, 100);
+  }
+</script>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([22.3193, 114.1694], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?key=cb1_3m7s_1_d6e2dc9e8aed12be2e5a2263', {
+    maxZoom: 19,
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  let estateData=[];
+  fetch('buildings.json')
+    .then(response => response.json())
+    .then(data => {
+      estateData = data.estates;
+    })
+    .catch(error => console.error('Error loading JSON:', error));
+
+  let activeMarker = [];
+
+  function findBuildings() {
+  const target_b=document.getElementById('BuildingName').value.trim();
+  if (!target_b){
+    alert("不能為空白");
+    return;
+  }
+  let found=false;
+  for (const estate of estateData) {
+    const bm = estate.buildings.find(b => b.name_en.toLowerCase() === target_b.toLowerCase() || b.name_zh === target_b);
+    if (bm){
+      found=true;
+      if (activeMarker) clearmarkers();
+
+      const lat=bm.coordinates.lat, lng=bm.coordinates.lng;
+
+      map.setView([lat, lng], 17);
+      activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(`<b>${bm.name_zh}</b>`).openPopup());
+      
+      break;
+    }
+  }
+  if (!found) alert("此樓宇和我對寶林的認知一樣不存在於此世上");
+}
+
+function findEstates() {
+  const target_e=document.getElementById('EstateName').value.trim();
+  if (!target_e){
+    alert("不能為空白");
+    return;
+  }
+  let em = null, found=false;
+  em = estateData.find(e => e.estate_en.toLowerCase() === target_e.toLowerCase() || e.estate_zh === target_e);
+  if (em){
+      found=true;
+      if (activeMarker) clearmarkers();
+      em.buildings.forEach(build=>{
+        const lat=build.coordinates.lat, lng=build.coordinates.lng;
+        map.setView([lat, lng], 17);
+        if(build.tag) mark=`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`;
+        else mark=`<b>${build.name_zh}</b><br>${build.name_en}`
+        activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(mark).openPopup());})
+    }    
+  else found=findGps(target_e, found);
+  if(!found) alert("此屋邨和我對寶林的認知一樣不存在於此世上");
+}
+
+function findGps(target_e, found){  
+  if (activeMarker) clearmarkers();
+  estateData.forEach(estate=>{
+    if(estate.gp_zh && estate.gp_en && (estate.gp_zh === target_e || estate.gp_en.toLowerCase()===target_e.toLowerCase())){
+      found=true;
+      estate.buildings.forEach(build=>{
+      const lat=build.coordinates.lat, lng=build.coordinates.lng;
+      map.setView([lat, lng], 17);
+      if(build.tag) mark=`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`;
+      else mark=`<b>${build.name_zh}</b><br>${build.name_en}`
+      activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(mark).openPopup());})
+    }
+  })
+  return found;
+}
+
+function findTypes(target_t){
+  if (activeMarker&&target_t!='和諧三A型'&&target_t!='和諧三C型') clearmarkers();
+  estateData.forEach(estate=>{
+    estate.buildings.forEach(build=>{
+      if((build.tag===target_t||build.type===target_t)||(target_t==='特別設計和諧式'&&build.tag==='特別設計新和諧式')){
+        const lat=build.coordinates.lat, lng=build.coordinates.lng;
+        map.setView([lat, lng], 17);
+        if(build.tag) mark=`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`;
+        else mark=`<b>${build.name_zh}</b><br>${build.name_en}`
+        activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(mark).openPopup());}})
+  })
+
+}
+
+function describe(bType, btn){
+  document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const box=document.getElementById('des'), title=document.getElementById('d-title'), cont=document.getElementById('d-content');
+  title.textContent=bType;
+  fetch(`types.html`).then(response=>{
+      if (!response.ok) throw new Error('File leh');
+      return response.text();}).then(htmlString=>{
+      const parser=new DOMParser();
+      const infos=parser.parseFromString(htmlString, 'text/html');
+      const info=infos.getElementById(`${bType}`);
+      if (info) cont.innerHTML = info.outerHTML;
+      else cont.innerHTML = `<div class="d-content"><p>仲 未 寫 完 哈 哈 哈</p></div>`;
+      box.style.display = 'block';
+    }).catch(error=>{
+      console.error('Error:', error);
+      box.innerHTML=`
+        <div class="d-content">
+          <p>載入失敗如同你的人生一樣</p>
+        </div>`;
+      descContainer.style.display = 'block';
+      box.style.display = 'block';
+    });
+}
+
+function articles(aTitle) {
+  const box = document.getElementById('des'), title = document.getElementById('d-title'), cont = document.getElementById('d-content');
+  title.textContent = aTitle;
+  fetch('article.html')
+    .then(response => {
+      if (!response.ok) throw new Error('File leh');
+      return response.text();}).then(htmlString => {
+      const parser = new DOMParser();
+      const docs = parser.parseFromString(htmlString, 'text/html');
+      const words = docs.getElementById(aTitle);
+      if (words) cont.innerHTML = words.innerHTML;
+      else cont.innerHTML = `<div class="d-content"><p>文章的存在情況就如同愉翠苑D&E座一樣。</p></div>`;
+      box.style.display = 'block';
+    }).catch(error => {
+      console.error('Error loading article:', error);
+      box.innerHTML = `
+        <div class="d-content">
+          <p>載入失敗如同你的人生一樣</p>
+        </div>`;
+      box.style.display = 'block';
+    });
+}
+
+function toggleTable(btn) {
+  const table = btn.closest('.table');
+  const tbody = table.querySelector('.table-body');
+  
+  tbody.classList.toggle('collapsed');
+  if (tbody.classList.contains('collapsed')) btn.textContent='[展開]';
+  else btn.textContent='[摺疊]';
+}
+
+/*forEach: ~for in list*/
+function clearmarkers(){
+  activeMarker.forEach(marker => {map.removeLayer(marker);});
+  activeMarker = [];
+}
+</script>
+
+</body>
+</html>
