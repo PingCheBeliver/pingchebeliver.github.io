@@ -4613,26 +4613,8 @@
           "name_zh": "衛民樓",
           "type": "雙塔式",
           "coordinates": {
-            "lat": 22.3128,
-            "lng": 114.1795
-          }
-        },
-        {
-          "name_en": "Sun Man House",
-          "name_zh": "新民樓",
-          "type": "雙塔式",
-          "coordinates": {
-            "lat": 22.313,
-            "lng": 114.179
-          }
-        },
-        {
-          "name_en": "Tak Man House",
-          "name_zh": "德民樓",
-          "type": "雙塔式",
-          "coordinates": {
-            "lat": 22.3135,
-            "lng": 114.1792
+            "lat": 22.313838,
+            "lng": 114.177405
           }
         },
         {
@@ -4640,8 +4622,26 @@
           "name_zh": "敦民樓",
           "type": "雙塔式",
           "coordinates": {
-            "lat": 22.3132,
-            "lng": 114.1787
+            "lat": 22.312887, 
+            "lng": 114.177335
+          }
+        },
+        {
+          "name_en": "Tak Man House",
+          "name_zh": "德民樓",
+          "type": "雙塔式",
+          "coordinates": {
+            "lat": 22.312887, 
+            "lng": 114.177335
+          }
+        },
+        {
+          "name_en": "Sun Man House",
+          "name_zh": "新民樓",
+          "type": "雙塔式",
+          "coordinates": {
+            "lat": 22.311292, 
+            "lng": 114.178336
           }
         },
         {
@@ -4649,8 +4649,8 @@
           "name_zh": "信民樓",
           "type": "雙塔式",
           "coordinates": {
-            "lat": 22.3125,
-            "lng": 114.1789
+            "lat": 22.310510,
+            "lng": 114.179030
           }
         },
         {
