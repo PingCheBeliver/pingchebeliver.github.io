@@ -592,7 +592,7 @@ function describe(bType, btn){
 function articles(aTitle) {
   const box = document.getElementById('des'), title = document.getElementById('d-title'), cont = document.getElementById('d-content');
   title.textContent = aTitle;
-  fetch(`types.html?v=${Date.now()}`)
+  fetch(`article.html?v=${Date.now()}`)
     .then(response => {
       if (!response.ok) throw new Error('File leh');
       return response.text();}).then(htmlString => {
