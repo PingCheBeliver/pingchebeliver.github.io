@@ -17,20 +17,18 @@
 
     .container {
       width: 100%;
-      max-width: 800px; /* Adjust max-width if you want a wider layout */
+      max-width: 800px; 
       display: flex;
       flex-direction: column;
-      align-items: center; /* Center-aligns child elements */
+      align-items: center; 
       gap: 16px;
     }
 
-    /* Title */
     h1 {
       text-align: center;
       margin: 0 0 8px 0;
     }
 
-    /* 2x2 Grid for mode switch */
     .button-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -39,7 +37,6 @@
       width: 100%;
     }
 
-    /* Button base */
     .mode-card {
       background: #ffffff;
       border: 1px solid #e9ecef;
@@ -54,7 +51,6 @@
       user-select: none;
     }
 
-    /* Icon Container - Fixed 100vw issue */
     .mode-icon {
       width: 40px;
       height: 40px;
@@ -72,14 +68,12 @@
       flex-direction: column;
     }
 
-    /*Words on buttons*/
     .mode-title {
       font-size: 18px;
       font-weight: 800;
       color: #212529;
     }
 
-    /* Active button */
     .mode-card.active {
       background: #c4e6f2;
       border-color: #434545;
@@ -90,7 +84,6 @@
       color: #000000;
     }
 
-    /* Main Content Card Below */
     .content-panel {
       background: #ffffff;
       border-radius: 10px;
@@ -190,7 +183,7 @@
   .a-list {
     display: flex;
     flex-direction: column;
-    gap: 0; /* Remove gap between buttons */
+    gap: 0; 
       width: 100%;
   }
   .a-click {
@@ -207,7 +200,6 @@
     margin-top: -1px; 
     transition: all 0.2s ease;
   }
-/* Rounded top & bottom corners on the first item */
   .a-click:first-child {
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
@@ -220,13 +212,13 @@
   .a-click:hover {
     background: #ffe84a;
     position: relative;
-    z-index: 1; /* Ensures hover outline stays on top */
+    z-index: 1; /*Let hover on top*/
     transform: translateY(-2px);
   }
   .a-click:active {
     background: #ff930e;
     position: relative;
-    z-index: 1; /* Ensures hover outline stays on top */
+    z-index: 1; 
     transform: translateY(0px);
   }
 
@@ -295,7 +287,6 @@
 
   <h1>公屋查詢大法</h1>
 
-  <!-- Top 2x2 Switch Grid -->
   <div class="button-grid">
     <div class="mode-card active" onclick="selectMode('name', this)">
       <div class="mode-icon">🏠</div>
@@ -319,7 +310,6 @@
     </div>
   </div>
 
-  <!-- Bottom Panel -->
   <div class="content-panel">
     <div id="panel-name" class="panel-section active">
       <h4 style="font-weight: bold; margin-bottom: 12px; margin-top: 0;">輸入樓宇名稱：</h4>
@@ -441,6 +431,7 @@
     </div>
   </div>
   <div id="map"></div>
+  <button class="search-btn" onclick="openMap()">Search in Google Maps</button>
   <div id="des" class="description">
     <h1 id="d-title"></h1>
     <p id="d-content"></p>
@@ -482,7 +473,7 @@
     .catch(error => console.error('Error loading JSON:', error));
 
   let activeMarker = [];
-
+    
   function findBuildings() {
   const target_b=document.getElementById('BuildingName').value.trim();
   if (!target_b){
@@ -521,8 +512,8 @@ function findEstates() {
       em.buildings.forEach(build=>{
         const lat=build.coordinates.lat, lng=build.coordinates.lng;
         map.setView([lat, lng], 17);
-        if(build.tag) mark=`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`;
-        else mark=`<b>${build.name_zh}</b><br>${build.name_en}`
+        mark=build.tag?`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`:`<b>${build.name_zh}</b><br>${build.name_en}`;
+        const marker = L.marker([lat, lng]);
         activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(mark).openPopup());})
     }    
   else found=findGps(target_e, found);
@@ -537,8 +528,7 @@ function findGps(target_e, found){
       estate.buildings.forEach(build=>{
       const lat=build.coordinates.lat, lng=build.coordinates.lng;
       map.setView([lat, lng], 17);
-      if(build.tag) mark=`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`;
-      else mark=`<b>${build.name_zh}</b><br>${build.name_en}`
+      mark=build.tag?`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`:`<b>${build.name_zh}</b><br>${build.name_en}`;
       activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(mark).openPopup());})
     }
   })
@@ -552,11 +542,9 @@ function findTypes(target_t){
       if((build.tag===target_t||build.type===target_t)||(target_t==='特別設計和諧式'&&build.tag==='特別設計新和諧式')){
         const lat=build.coordinates.lat, lng=build.coordinates.lng;
         map.setView([lat, lng], 17);
-        if(build.tag) mark=`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`;
-        else mark=`<b>${build.name_zh}</b><br>${build.name_en}`
+        mark=build.tag?`<b>${build.name_zh}</b><br>${build.name_en}<br>*${build.tag}`:`<b>${build.name_zh}</b><br>${build.name_en}`;
         activeMarker.push(L.marker([lat, lng]).addTo(map).bindPopup(mark).openPopup());}})
   })
-
 }
 
 function describe(bType, btn){
@@ -564,7 +552,7 @@ function describe(bType, btn){
   if (btn) btn.classList.add('active');
   const box=document.getElementById('des'), title=document.getElementById('d-title'), cont=document.getElementById('d-content');
   title.textContent=bType;
-  fetch(`types.html`).then(response=>{
+  fetch(`types.html?v=${Date.now()}`).then(response=>{
       if (!response.ok) throw new Error('File leh');
       return response.text();}).then(htmlString=>{
       const parser=new DOMParser();
@@ -587,7 +575,7 @@ function describe(bType, btn){
 function articles(aTitle) {
   const box = document.getElementById('des'), title = document.getElementById('d-title'), cont = document.getElementById('d-content');
   title.textContent = aTitle;
-  fetch('article.html')
+  fetch(`types.html?v=${Date.now()}`)
     .then(response => {
       if (!response.ok) throw new Error('File leh');
       return response.text();}).then(htmlString => {
