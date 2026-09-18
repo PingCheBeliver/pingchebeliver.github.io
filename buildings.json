@@ -10960,7 +10960,7 @@
         }
       ]
     },
-    {
+   {
       "estate_zh": "雍盛苑",
       "estate_en": "Yung Shing Court",
       "buildings": [
@@ -10971,17 +10971,17 @@
           "tag": "連附翼",
           "coordinates": {
             "lat": 22.481655,
-            "lng": 114.142747
+            "lng": 114.136823
           }
         },
         {
           "name_en": "Yung Sui House",
-          "name_zh": "雍華閣",
+          "name_zh": "雍萃閣",
           "type": "和諧一型",
           "tag": "連附翼",
           "coordinates": {
             "lat": 22.482550,
-            "lng": 114.147493
+            "lng": 114.137493
           }
         }
       ]
@@ -11005,7 +11005,7 @@
           "type": "非標準設計大廈",
           "coordinates": {
             "lat": 22.480775,
-            "lng": 114.146245
+            "lng": 114.136245
           }
         }
       ]
@@ -11100,6 +11100,21 @@
           "coordinates": {
             "lat": 22.485776,
             "lng": 114.143293
+          }
+        }
+      ]
+    },
+    {
+      "estate_zh": "樂嶺都匯",
+      "estate_en": "Casa Sierra",
+      "buildings": [
+        {
+          "name_en": "Sierra Tower",
+          "name_zh": "樂嶺樓",
+          "type": "房協住宅",
+          "coordinates": {
+            "lat": 22.489790, 
+            "lng": 114.139195
           }
         }
       ]
