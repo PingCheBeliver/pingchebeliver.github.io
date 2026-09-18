@@ -2234,7 +2234,7 @@
         {
           "name_en": "Sau Fai House",
           "name_zh": "秀暉樓",
-          "type": "單向設計大廈",
+          "type": "單方向設計大廈",
           "coordinates": {
             "lat": 22.317582,
             "lng": 114.235227
@@ -12675,7 +12675,7 @@
         {
           "name_en": "Wah Choi House",
           "name_zh": "華彩樓",
-          "type": "單向設計大廈",
+          "type": "單方向設計大廈",
           "coordinates": {
             "lat": 22.461471,
             "lng": 113.995776
@@ -12684,7 +12684,7 @@
         {
           "name_en": "Wah Long House",
           "name_zh": "華朗樓",
-          "type": "單向設計大廈",
+          "type": "單方向設計大廈",
           "coordinates": {
             "lat": 22.461475,
             "lng": 113.995222
